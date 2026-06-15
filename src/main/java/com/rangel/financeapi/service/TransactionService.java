@@ -2,8 +2,10 @@ package com.rangel.financeapi.service;
 
 import com.rangel.financeapi.dto.TransactionRequestDTO;
 import com.rangel.financeapi.dto.TransactionResponseDTO;
+import com.rangel.financeapi.model.Category;
 import com.rangel.financeapi.model.Transaction;
 import com.rangel.financeapi.model.User;
+import com.rangel.financeapi.repository.CategoryRepository;
 import com.rangel.financeapi.repository.TransactionRepository;
 import com.rangel.financeapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,17 +18,24 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
-
+    private final CategoryRepository categoryRepository;
 
     public TransactionResponseDTO createTransaction(TransactionRequestDTO dto, String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Category category = null;
+        if (dto.getCategoryId() != null) {
+            category = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
+        }
 
         Transaction transaction = Transaction.builder()
                 .description(dto.getDescription())
                 .amount(dto.getAmount())
                 .type(dto.getType())
                 .user(user)
+                .category(category)
                 .build();
 
         Transaction saved = transactionRepository.save(transaction);
@@ -37,6 +46,7 @@ public class TransactionService {
                 .amount(saved.getAmount())
                 .type(saved.getType())
                 .createdAt(saved.getCreatedAt())
+                .categoryId(saved.getCategory() != null ? saved.getCategory().getId() : null)
                 .build();
     }
 
@@ -52,6 +62,7 @@ public class TransactionService {
                         .amount(t.getAmount())
                         .type(t.getType())
                         .createdAt(t.getCreatedAt())
+                        .categoryId(t.getCategory() != null ? t.getCategory().getId() : null)
                         .build())
                 .toList();
     }

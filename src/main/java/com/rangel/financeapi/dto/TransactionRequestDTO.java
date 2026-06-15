@@ -15,4 +15,5 @@ public class TransactionRequestDTO {
     private String description;
     private BigDecimal amount;
     private Type type;
+    private Long categoryId;
 }
