@@ -1,15 +1,18 @@
 package com.rangel.financeapi.service;
 
+import com.rangel.financeapi.dto.SummaryResponseDTO;
 import com.rangel.financeapi.dto.TransactionRequestDTO;
 import com.rangel.financeapi.dto.TransactionResponseDTO;
 import com.rangel.financeapi.model.Category;
 import com.rangel.financeapi.model.Transaction;
+import com.rangel.financeapi.model.Type;
 import com.rangel.financeapi.model.User;
 import com.rangel.financeapi.repository.CategoryRepository;
 import com.rangel.financeapi.repository.TransactionRepository;
 import com.rangel.financeapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -66,4 +69,37 @@ public class TransactionService {
                         .build())
                 .toList();
     }
+
+    public SummaryResponseDTO getSummary(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        BigDecimal totalIncome = transactionRepository.sumByUserAndType(user.getId(), Type.INCOME);
+        BigDecimal totalExpenses = transactionRepository.sumByUserAndType(user.getId(), Type.EXPENSES);
+        BigDecimal balance = totalIncome.subtract(totalExpenses);
+
+        return SummaryResponseDTO.builder()
+                .totalIncome(totalIncome)
+                .totalExpenses(totalExpenses)
+                .balance(balance)
+                .build();
+    }
+
+    public List<TransactionResponseDTO> getTransactionsByCategory(String userEmail, Long categoryId) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return transactionRepository.findByUserIdAndCategoryId(user.getId(), categoryId)
+                .stream()
+                .map(t -> TransactionResponseDTO.builder()
+                        .id(t.getId())
+                        .description(t.getDescription())
+                        .amount(t.getAmount())
+                        .type(t.getType())
+                        .createdAt(t.getCreatedAt())
+                        .categoryId(t.getCategory() != null ? t.getCategory().getId() : null)
+                        .build())
+                .toList();
+    }
+
 }
