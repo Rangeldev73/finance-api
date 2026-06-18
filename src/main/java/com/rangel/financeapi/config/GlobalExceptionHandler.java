@@ -4,10 +4,12 @@ package com.rangel.financeapi.config;
 import com.rangel.financeapi.dto.ApiError;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -17,6 +19,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(401).body(ApiError.builder()
                 .status(401)
                 .message("Invalid email or password")
+                .timestamp(LocalDateTime.now())
+                .build());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        return ResponseEntity.status(400).body(ApiError.builder()
+                .status(400)
+                .message(message)
                 .timestamp(LocalDateTime.now())
                 .build());
     }

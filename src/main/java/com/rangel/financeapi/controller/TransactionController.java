@@ -4,6 +4,7 @@ import com.rangel.financeapi.dto.SummaryResponseDTO;
 import com.rangel.financeapi.dto.TransactionRequestDTO;
 import com.rangel.financeapi.dto.TransactionResponseDTO;
 import com.rangel.financeapi.service.TransactionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +26,7 @@ public class TransactionController {
 
     @PostMapping
     public ResponseEntity<TransactionResponseDTO> create(
-            @RequestBody TransactionRequestDTO dto,
+            @Valid@RequestBody TransactionRequestDTO dto,
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.status(201)
                 .body(transactionService.createTransaction(dto, userDetails.getUsername()));
