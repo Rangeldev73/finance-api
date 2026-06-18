@@ -3,6 +3,7 @@ package com.rangel.financeapi.controller;
 import com.rangel.financeapi.dto.CategoryRequestDTO;
 import com.rangel.financeapi.dto.CategoryResponseDTO;
 import com.rangel.financeapi.service.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +23,7 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<CategoryResponseDTO> create(
-        @RequestBody CategoryRequestDTO dto,
+        @Valid @RequestBody CategoryRequestDTO dto,
         @AuthenticationPrincipal UserDetails userDetails){
             return ResponseEntity.status(201)
                     .body(categoryService.createCategory(dto, userDetails.getUsername()));

@@ -1,5 +1,7 @@
 package com.rangel.financeapi.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryRequestDTO {
+    @NotBlank
+    @Size(max=255)
     private String name;
+
+    @NotBlank
+    @Size(max=7)
     private String color;
 }
