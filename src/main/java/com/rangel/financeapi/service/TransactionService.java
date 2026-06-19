@@ -119,4 +119,15 @@ public class TransactionService {
                 .categoryId(transaction.getCategory() != null ? transaction.getCategory().getId() : null)
                 .build();
     }
+
+    public void deleteTransaction(Long id, String userEmail){
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        if (!transaction.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Transaction not found");
+        }
+        transactionRepository.delete(transaction);
+    }
 }

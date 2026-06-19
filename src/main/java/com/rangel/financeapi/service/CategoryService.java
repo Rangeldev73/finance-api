@@ -7,6 +7,7 @@ import com.rangel.financeapi.model.Category;
 import com.rangel.financeapi.model.Transaction;
 import com.rangel.financeapi.model.User;
 import com.rangel.financeapi.repository.CategoryRepository;
+import com.rangel.financeapi.repository.TransactionRepository;
 import com.rangel.financeapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class CategoryService {
 
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final TransactionRepository transactionRepository;
 
     public CategoryResponseDTO createCategory(CategoryRequestDTO dto, String userEmail){
         User user = userRepository.findByEmail(userEmail)
@@ -69,5 +71,19 @@ public class CategoryService {
                 .color(category.getColor())
                 .createdAt(category.getCreatedAt())
                 .build();
+    }
+
+    public void deleteCategory(Long id, String userEmail){
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        if (!category.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Category not found");
+        }
+        if (transactionRepository.existsByCategoryId(id)) {
+            throw new RuntimeException("Category has transactions and cannot be deleted");
+        }
+        categoryRepository.delete(category);
     }
 }
