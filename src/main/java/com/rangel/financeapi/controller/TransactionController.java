@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,6 +51,14 @@ public class TransactionController {
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(
                 transactionService.getTransactionsByCategory(userDetails.getUsername(), categoryId)
+        );
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TransactionResponseDTO> getTransactionById(
+        @PathVariable Long id,
+        @AuthenticationPrincipal UserDetails userDetails){
+        return ResponseEntity.ok(transactionService.getTransactionById(id, userDetails.getUsername())
         );
     }
 }

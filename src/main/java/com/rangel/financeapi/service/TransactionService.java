@@ -102,4 +102,21 @@ public class TransactionService {
                 .toList();
     }
 
+    public TransactionResponseDTO getTransactionById(Long id, String userEmail){
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        if (!transaction.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Transaction not found");
+        }
+        return TransactionResponseDTO.builder()
+                .id(transaction.getId())
+                .description(transaction.getDescription())
+                .amount(transaction.getAmount())
+                .type(transaction.getType())
+                .createdAt(transaction.getCreatedAt())
+                .categoryId(transaction.getCategory() != null ? transaction.getCategory().getId() : null)
+                .build();
+    }
 }

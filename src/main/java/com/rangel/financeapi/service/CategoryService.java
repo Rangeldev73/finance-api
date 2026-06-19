@@ -2,7 +2,9 @@ package com.rangel.financeapi.service;
 
 import com.rangel.financeapi.dto.CategoryRequestDTO;
 import com.rangel.financeapi.dto.CategoryResponseDTO;
+import com.rangel.financeapi.dto.TransactionResponseDTO;
 import com.rangel.financeapi.model.Category;
+import com.rangel.financeapi.model.Transaction;
 import com.rangel.financeapi.model.User;
 import com.rangel.financeapi.repository.CategoryRepository;
 import com.rangel.financeapi.repository.UserRepository;
@@ -51,5 +53,21 @@ public class CategoryService {
                         .createdAt(c.getCreatedAt())
                         .build())
                 .toList();
+    }
+
+    public CategoryResponseDTO getCategoryById(Long id, String userEmail){
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        if (!category.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Category not found");
+        }
+        return CategoryResponseDTO.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .color(category.getColor())
+                .createdAt(category.getCreatedAt())
+                .build();
     }
 }
