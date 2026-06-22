@@ -130,4 +130,30 @@ public class TransactionService {
         }
         transactionRepository.delete(transaction);
     }
+
+    public TransactionResponseDTO updateTransaction(Long id, TransactionRequestDTO dto, String userEmail){
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        if (!transaction.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Transaction not found");
+        }
+        Category category = categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        transaction.setCategory(category);
+        transaction.setDescription(dto.getDescription());
+        transaction.setAmount(dto.getAmount());
+        transaction.setType(dto.getType());
+        transactionRepository.save(transaction);
+        return TransactionResponseDTO.builder()
+                .id(transaction.getId())
+                .description(transaction.getDescription())
+                .categoryId(transaction.getCategory().getId())
+                .amount(transaction.getAmount())
+                .type(transaction.getType())
+                .createdAt(transaction.getCreatedAt())
+                .build();
+
+    }
 }

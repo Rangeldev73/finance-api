@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -69,5 +70,13 @@ public class TransactionController {
             @AuthenticationPrincipal UserDetails userDetails){
         transactionService.deleteTransaction(id, userDetails.getUsername());
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TransactionResponseDTO> updateTransaction(
+            @PathVariable Long id,
+            @Valid @RequestBody TransactionRequestDTO dto,
+            @AuthenticationPrincipal UserDetails userDetails){
+        return ResponseEntity.ok(transactionService.updateTransaction(id,dto,userDetails.getUsername()));
     }
 }
