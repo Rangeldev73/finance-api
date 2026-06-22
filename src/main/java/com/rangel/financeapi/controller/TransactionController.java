@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -78,5 +80,13 @@ public class TransactionController {
             @Valid @RequestBody TransactionRequestDTO dto,
             @AuthenticationPrincipal UserDetails userDetails){
         return ResponseEntity.ok(transactionService.updateTransaction(id,dto,userDetails.getUsername()));
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<TransactionResponseDTO>> filterByPeriod(
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate,
+            @AuthenticationPrincipal UserDetails userDetails){
+        return ResponseEntity.ok(transactionService.filterByPeriod(userDetails.getUsername(), startDate, endDate));
     }
 }

@@ -13,6 +13,9 @@ import com.rangel.financeapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -154,5 +157,24 @@ public class TransactionService {
                 .type(transaction.getType())
                 .createdAt(transaction.getCreatedAt())
                 .build();
+    }
+
+    public List<TransactionResponseDTO> filterByPeriod(String userEmail, LocalDate startDate, LocalDate endDate){
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+        List<Transaction> transactions = transactionRepository.findByUserAndCreatedAtBetween(user, startDateTime, endDateTime);
+        return transactions
+                .stream()
+                .map(t -> TransactionResponseDTO.builder()
+                        .id(t.getId())
+                        .description(t.getDescription())
+                        .amount(t.getAmount())
+                        .type(t.getType())
+                        .createdAt(t.getCreatedAt())
+                        .categoryId(t.getCategory() != null ? t.getCategory().getId() : null)
+                        .build())
+                .toList();
     }
 }
