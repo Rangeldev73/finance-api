@@ -86,4 +86,23 @@ public class CategoryService {
         }
         categoryRepository.delete(category);
     }
+
+    public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO dto, String userEmail){
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        if (!category.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Category not found");
+        }
+        category.setName(dto.getName());
+        category.setColor(dto.getColor());
+        categoryRepository.save(category);
+        return CategoryResponseDTO.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .color(category.getColor())
+                .createdAt(category.getCreatedAt())
+                .build();
+    }
 }

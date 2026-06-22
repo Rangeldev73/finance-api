@@ -2,6 +2,7 @@ package com.rangel.financeapi.controller;
 
 import com.rangel.financeapi.dto.CategoryRequestDTO;
 import com.rangel.financeapi.dto.CategoryResponseDTO;
+import com.rangel.financeapi.dto.TransactionRequestDTO;
 import com.rangel.financeapi.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,5 +53,13 @@ public class CategoryController {
             @AuthenticationPrincipal UserDetails userDetails){
         categoryService.deleteCategory(id, userDetails.getUsername());
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryResponseDTO> updateCategory(
+            @PathVariable Long id,
+            @Valid @RequestBody CategoryRequestDTO dto,
+            @AuthenticationPrincipal UserDetails userDetails){
+        return ResponseEntity.ok(categoryService.updateCategory(id,dto,userDetails.getUsername()));
     }
 }

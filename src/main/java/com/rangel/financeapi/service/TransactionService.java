@@ -154,6 +154,5 @@ public class TransactionService {
                 .type(transaction.getType())
                 .createdAt(transaction.getCreatedAt())
                 .build();
-
     }
 }
