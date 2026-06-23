@@ -28,4 +28,7 @@ public interface TransactionRepository  extends JpaRepository<Transaction,  Long
     List<Transaction> findByUserAndCreatedAtBetween(@Param("user") User user, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     Page<Transaction> findByUserId(Long userId, Pageable pageable);
+
+    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.user.id = :userId AND t.category.id = :categoryId AND MONTH(t.createdAt) = :month AND YEAR(t.createdAt) = :year")
+    BigDecimal sumByUserAndCategoryAndPeriod(@Param("userId") Long userId, @Param("categoryId") Long categoryId, @Param("month") int month, @Param("year") int year);
 }
