@@ -4,6 +4,8 @@ import com.rangel.financeapi.dto.TransactionResponseDTO;
 import com.rangel.financeapi.model.Transaction;
 import com.rangel.financeapi.model.Type;
 import com.rangel.financeapi.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,4 +26,6 @@ public interface TransactionRepository  extends JpaRepository<Transaction,  Long
 
     @Query("SELECT t FROM Transaction t WHERE t.user = :user AND t.createdAt >= :startDate AND t.createdAt <= :endDate")
     List<Transaction> findByUserAndCreatedAtBetween(@Param("user") User user, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    Page<Transaction> findByUserId(Long userId, Pageable pageable);
 }

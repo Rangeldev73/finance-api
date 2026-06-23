@@ -6,6 +6,7 @@ import com.rangel.financeapi.dto.TransactionResponseDTO;
 import com.rangel.financeapi.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -88,5 +89,13 @@ public class TransactionController {
             @RequestParam LocalDate endDate,
             @AuthenticationPrincipal UserDetails userDetails){
         return ResponseEntity.ok(transactionService.filterByPeriod(userDetails.getUsername(), startDate, endDate));
+    }
+
+    @GetMapping("/paged")
+    public ResponseEntity<Page<TransactionResponseDTO>> getTransactionsPaged(
+            @RequestParam int page,
+            @RequestParam int size,
+            @AuthenticationPrincipal UserDetails userDetails){
+        return ResponseEntity.ok(transactionService.getTransactionsPaged(userDetails.getUsername(),page,size));
     }
 }

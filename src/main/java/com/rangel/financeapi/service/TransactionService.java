@@ -11,6 +11,9 @@ import com.rangel.financeapi.repository.CategoryRepository;
 import com.rangel.financeapi.repository.TransactionRepository;
 import com.rangel.financeapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -176,5 +179,20 @@ public class TransactionService {
                         .categoryId(t.getCategory() != null ? t.getCategory().getId() : null)
                         .build())
                 .toList();
+    }
+
+    public Page<TransactionResponseDTO> getTransactionsPaged(String userEmail, int page, int size){
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Transaction> transactions = transactionRepository.findByUserId(user.getId(), pageable);
+        return transactions.map(t -> TransactionResponseDTO.builder()
+                        .id(t.getId())
+                        .description(t.getDescription())
+                        .amount(t.getAmount())
+                        .type(t.getType())
+                        .createdAt(t.getCreatedAt())
+                        .categoryId(t.getCategory() != null ? t.getCategory().getId() : null)
+                        .build());
     }
 }
