@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -56,9 +57,11 @@ public class TransactionService {
                 .type(saved.getType())
                 .createdAt(saved.getCreatedAt())
                 .categoryId(saved.getCategory() != null ? saved.getCategory().getId() : null)
+                .categoryName(saved.getCategory() != null ? saved.getCategory().getName() : null)
                 .build();
     }
 
+    @Transactional
     public List<TransactionResponseDTO> getTransactionsByUser(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -72,6 +75,7 @@ public class TransactionService {
                         .type(t.getType())
                         .createdAt(t.getCreatedAt())
                         .categoryId(t.getCategory() != null ? t.getCategory().getId() : null)
+                        .categoryName(t.getCategory() != null ? t.getCategory().getName() : null)
                         .build())
                 .toList();
     }
@@ -91,6 +95,7 @@ public class TransactionService {
                 .build();
     }
 
+    @Transactional
     public List<TransactionResponseDTO> getTransactionsByCategory(String userEmail, Long categoryId) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -104,11 +109,13 @@ public class TransactionService {
                         .type(t.getType())
                         .createdAt(t.getCreatedAt())
                         .categoryId(t.getCategory() != null ? t.getCategory().getId() : null)
+                        .categoryName(t.getCategory() != null ? t.getCategory().getName() : null)
                         .build())
                 .toList();
     }
 
-    public TransactionResponseDTO getTransactionById(Long id, String userEmail){
+    @Transactional
+    public TransactionResponseDTO getTransactionById(Long id, String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Transaction transaction = transactionRepository.findById(id)
@@ -123,10 +130,11 @@ public class TransactionService {
                 .type(transaction.getType())
                 .createdAt(transaction.getCreatedAt())
                 .categoryId(transaction.getCategory() != null ? transaction.getCategory().getId() : null)
+                .categoryName(transaction.getCategory() != null ? transaction.getCategory().getName() : null)
                 .build();
     }
 
-    public void deleteTransaction(Long id, String userEmail){
+    public void deleteTransaction(Long id, String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Transaction transaction = transactionRepository.findById(id)
@@ -137,7 +145,7 @@ public class TransactionService {
         transactionRepository.delete(transaction);
     }
 
-    public TransactionResponseDTO updateTransaction(Long id, TransactionRequestDTO dto, String userEmail){
+    public TransactionResponseDTO updateTransaction(Long id, TransactionRequestDTO dto, String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Transaction transaction = transactionRepository.findById(id)
@@ -155,14 +163,16 @@ public class TransactionService {
         return TransactionResponseDTO.builder()
                 .id(transaction.getId())
                 .description(transaction.getDescription())
-                .categoryId(transaction.getCategory().getId())
                 .amount(transaction.getAmount())
                 .type(transaction.getType())
                 .createdAt(transaction.getCreatedAt())
+                .categoryId(transaction.getCategory().getId())
+                .categoryName(transaction.getCategory().getName())
                 .build();
     }
 
-    public List<TransactionResponseDTO> filterByPeriod(String userEmail, LocalDate startDate, LocalDate endDate){
+    @Transactional
+    public List<TransactionResponseDTO> filterByPeriod(String userEmail, LocalDate startDate, LocalDate endDate) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         LocalDateTime startDateTime = startDate.atStartOfDay();
@@ -177,22 +187,25 @@ public class TransactionService {
                         .type(t.getType())
                         .createdAt(t.getCreatedAt())
                         .categoryId(t.getCategory() != null ? t.getCategory().getId() : null)
+                        .categoryName(t.getCategory() != null ? t.getCategory().getName() : null)
                         .build())
                 .toList();
     }
 
-    public Page<TransactionResponseDTO> getTransactionsPaged(String userEmail, int page, int size){
+    @Transactional
+    public Page<TransactionResponseDTO> getTransactionsPaged(String userEmail, int page, int size) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Pageable pageable = PageRequest.of(page, size);
         Page<Transaction> transactions = transactionRepository.findByUserId(user.getId(), pageable);
         return transactions.map(t -> TransactionResponseDTO.builder()
-                        .id(t.getId())
-                        .description(t.getDescription())
-                        .amount(t.getAmount())
-                        .type(t.getType())
-                        .createdAt(t.getCreatedAt())
-                        .categoryId(t.getCategory() != null ? t.getCategory().getId() : null)
-                        .build());
+                .id(t.getId())
+                .description(t.getDescription())
+                .amount(t.getAmount())
+                .type(t.getType())
+                .createdAt(t.getCreatedAt())
+                .categoryId(t.getCategory() != null ? t.getCategory().getId() : null)
+                .categoryName(t.getCategory() != null ? t.getCategory().getName() : null)
+                .build());
     }
 }

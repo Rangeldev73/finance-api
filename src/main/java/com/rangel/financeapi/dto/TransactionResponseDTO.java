@@ -18,5 +18,6 @@ public class TransactionResponseDTO {
     private BigDecimal amount;
     private Type type;
     private Long categoryId;
+    private String categoryName;
     private LocalDateTime createdAt;
 }
