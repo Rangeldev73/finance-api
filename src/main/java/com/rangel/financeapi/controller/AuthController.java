@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/auth")
@@ -32,6 +33,11 @@ public class AuthController {
         cookie.setPath("/");
         cookie.setMaxAge(86400);
         response.addCookie(cookie);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Void> me() {
         return ResponseEntity.ok().build();
     }
 
