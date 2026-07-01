@@ -49,10 +49,12 @@ public class RateLimitingFilter implements Filter {
             String path = httpRequest.getRequestURI();
 
             Bucket bucket;
-            if (path.startsWith("/auth/")) {
-                bucket = authBuckets.computeIfAbsent(ip, k -> createAuthBucket());
+            if (path.equals("/auth/me")) {
+                bucket = apiBuckets.computeIfAbsent(ip, k -> createApiBucket()); // 60/min
+            } else if (path.startsWith("/auth/")) {
+                bucket = authBuckets.computeIfAbsent(ip, k -> createAuthBucket()); // 10/min
             } else {
-                bucket = apiBuckets.computeIfAbsent(ip, k -> createApiBucket());
+                bucket = apiBuckets.computeIfAbsent(ip, k -> createApiBucket()); // 60/min
             }
 
             if (bucket.tryConsume(1)) {
