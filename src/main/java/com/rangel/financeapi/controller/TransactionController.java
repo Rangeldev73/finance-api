@@ -87,8 +87,9 @@ public class TransactionController {
     public ResponseEntity<List<TransactionResponseDTO>> filterByPeriod(
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate,
+            @RequestParam(required = false) Long categoryId,
             @AuthenticationPrincipal UserDetails userDetails){
-        return ResponseEntity.ok(transactionService.filterByPeriod(userDetails.getUsername(), startDate, endDate));
+        return ResponseEntity.ok(transactionService.filterByPeriod(userDetails.getUsername(), startDate, endDate, categoryId));
     }
 
     @GetMapping("/paged")

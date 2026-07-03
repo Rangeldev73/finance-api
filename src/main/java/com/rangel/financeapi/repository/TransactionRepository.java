@@ -31,4 +31,7 @@ public interface TransactionRepository  extends JpaRepository<Transaction,  Long
 
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.user.id = :userId AND t.category.id = :categoryId AND MONTH(t.createdAt) = :month AND YEAR(t.createdAt) = :year")
     BigDecimal sumByUserAndCategoryAndPeriod(@Param("userId") Long userId, @Param("categoryId") Long categoryId, @Param("month") int month, @Param("year") int year);
+
+    @Query("SELECT t FROM Transaction t WHERE t.user = :user AND t.createdAt >= :startDate AND t.createdAt <= :endDate AND (:categoryId IS NULL OR t.category.id = :categoryId)")
+    List<Transaction> findByUserAndCreatedAtBetweenAndCategory(@Param("user") User user, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, @Param("categoryId") Long categoryId);
 }

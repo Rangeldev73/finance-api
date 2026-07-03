@@ -173,14 +173,13 @@ public class TransactionService {
     }
 
     @Transactional
-    public List<TransactionResponseDTO> filterByPeriod(String userEmail, LocalDate startDate, LocalDate endDate) {
+    public List<TransactionResponseDTO> filterByPeriod(String userEmail, LocalDate startDate, LocalDate endDate, Long categoryId) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
-        List<Transaction> transactions = transactionRepository.findByUserAndCreatedAtBetween(user, startDateTime, endDateTime);
-        return transactions
-                .stream()
+        List<Transaction> transactions = transactionRepository.findByUserAndCreatedAtBetweenAndCategory(user, startDateTime, endDateTime, categoryId);
+        return transactions.stream()
                 .map(t -> TransactionResponseDTO.builder()
                         .id(t.getId())
                         .description(t.getDescription())
