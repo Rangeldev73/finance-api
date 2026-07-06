@@ -21,6 +21,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -85,8 +87,14 @@ public class TransactionService {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        BigDecimal totalIncome = transactionRepository.sumByUserAndType(user.getId(), Type.INCOME);
-        BigDecimal totalExpenses = transactionRepository.sumByUserAndType(user.getId(), Type.EXPENSES);
+        BigDecimal totalIncome = Optional.ofNullable(
+                transactionRepository.sumByUserAndType(user.getId(), Type.INCOME)
+        ).orElse(BigDecimal.ZERO);
+
+        BigDecimal totalExpenses = Optional.ofNullable(
+                transactionRepository.sumByUserAndType(user.getId(), Type.EXPENSES)
+        ).orElse(BigDecimal.ZERO);
+
         BigDecimal balance = totalIncome.subtract(totalExpenses);
 
         return SummaryResponseDTO.builder()
