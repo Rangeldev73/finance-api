@@ -46,8 +46,10 @@ public class TransactionController {
 
     @GetMapping("/summary")
     public ResponseEntity<SummaryResponseDTO> getSummary(
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(transactionService.getSummary(userDetails.getUsername()));
+        return ResponseEntity.ok(transactionService.getSummary(userDetails.getUsername(), startDate, endDate));
     }
 
     @GetMapping("/by-category")

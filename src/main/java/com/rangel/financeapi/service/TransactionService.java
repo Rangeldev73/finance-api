@@ -83,17 +83,31 @@ public class TransactionService {
                 .toList();
     }
 
-    public SummaryResponseDTO getSummary(String userEmail) {
+    public SummaryResponseDTO getSummary(String userEmail, LocalDate startDate, LocalDate endDate) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        BigDecimal totalIncome = Optional.ofNullable(
-                transactionRepository.sumByUserAndType(user.getId(), Type.INCOME)
-        ).orElse(BigDecimal.ZERO);
+        BigDecimal totalIncome;
+        BigDecimal totalExpenses;
 
-        BigDecimal totalExpenses = Optional.ofNullable(
-                transactionRepository.sumByUserAndType(user.getId(), Type.EXPENSES)
-        ).orElse(BigDecimal.ZERO);
+        if (startDate == null || endDate == null) {
+            totalIncome = Optional.ofNullable(
+                    transactionRepository.sumByUserAndType(user.getId(), Type.INCOME)
+            ).orElse(BigDecimal.ZERO);
+            totalExpenses = Optional.ofNullable(
+                    transactionRepository.sumByUserAndType(user.getId(), Type.EXPENSES)
+            ).orElse(BigDecimal.ZERO);
+        } else {
+            LocalDateTime startDateTime = startDate.atStartOfDay();
+            LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+            totalIncome = Optional.ofNullable(
+                    transactionRepository.sumByUserAndTypeAndCreatedAtBetween(user.getId(), Type.INCOME, startDateTime, endDateTime)
+            ).orElse(BigDecimal.ZERO);
+
+            totalExpenses = Optional.ofNullable(
+                    transactionRepository.sumByUserAndTypeAndCreatedAtBetween(user.getId(), Type.EXPENSES, startDateTime, endDateTime)
+            ).orElse(BigDecimal.ZERO);
+        }
 
         BigDecimal balance = totalIncome.subtract(totalExpenses);
 
