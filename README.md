@@ -155,11 +155,11 @@ A API estará disponível em `http://localhost:8080`
 
 ## Deploy
 
-| Serviço | Plataforma |
-|---------|------------|
-| Backend | Railway |
-| Banco de dados | Neon (PostgreSQL) |
-| Frontend | Vercel |
+| Serviço | Plataforma        |
+|---------|-------------------|
+| Backend | Railway           |
+| Banco de dados | Supabase (PostgreSQL) |
+| Frontend | Vercel            |
 
 ### Variáveis de ambiente em produção
 
@@ -329,11 +329,11 @@ The API will be available at `http://localhost:8080`
 
 ## Deploy
 
-| Service | Platform |
-|---------|----------|
-| Backend | Railway |
-| Database | Neon (PostgreSQL) |
-| Frontend | Vercel |
+| Service | Platform              |
+|---------|-----------------------|
+| Backend | Railway               |
+| Database | Supabase (PostgreSQL) |
+| Frontend | Vercel                |
 
 ### Production environment variables
 
