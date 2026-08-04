@@ -89,6 +89,7 @@ public class TransactionService {
 
         BigDecimal totalIncome;
         BigDecimal totalExpenses;
+        BigDecimal balance;
 
         if (startDate == null || endDate == null) {
             totalIncome = Optional.ofNullable(
@@ -97,19 +98,25 @@ public class TransactionService {
             totalExpenses = Optional.ofNullable(
                     transactionRepository.sumByUserAndType(user.getId(), Type.EXPENSES)
             ).orElse(BigDecimal.ZERO);
+            balance = totalIncome.subtract(totalExpenses);
         } else {
             LocalDateTime startDateTime = startDate.atStartOfDay();
             LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
             totalIncome = Optional.ofNullable(
                     transactionRepository.sumByUserAndTypeAndCreatedAtBetween(user.getId(), Type.INCOME, startDateTime, endDateTime)
             ).orElse(BigDecimal.ZERO);
-
             totalExpenses = Optional.ofNullable(
                     transactionRepository.sumByUserAndTypeAndCreatedAtBetween(user.getId(), Type.EXPENSES, startDateTime, endDateTime)
             ).orElse(BigDecimal.ZERO);
-        }
+            BigDecimal overallIncome = Optional.ofNullable(
+                    transactionRepository.sumByUserAndType(user.getId(), Type.INCOME)
+            ).orElse(BigDecimal.ZERO);
 
-        BigDecimal balance = totalIncome.subtract(totalExpenses);
+            BigDecimal overallExpenses = Optional.ofNullable(
+                    transactionRepository.sumByUserAndType(user.getId(), Type.EXPENSES)
+            ).orElse(BigDecimal.ZERO);
+            balance = overallIncome.subtract(overallExpenses);
+        }
 
         return SummaryResponseDTO.builder()
                 .totalIncome(totalIncome)
