@@ -1,6 +1,5 @@
 package com.rangel.financeapi.repository;
 
-import com.rangel.financeapi.dto.TransactionResponseDTO;
 import com.rangel.financeapi.model.Transaction;
 import com.rangel.financeapi.model.Type;
 import com.rangel.financeapi.model.User;
