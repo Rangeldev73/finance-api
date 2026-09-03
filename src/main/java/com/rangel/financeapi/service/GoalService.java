@@ -11,6 +11,8 @@ import com.rangel.financeapi.repository.GoalRepository;
 import com.rangel.financeapi.repository.TransactionRepository;
 import com.rangel.financeapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,6 +30,18 @@ public class GoalService {
     private final CategoryRepository categoryRepository;
     private final TransactionRepository transactionRepository;
     private final GoalRepository goalRepository;
+
+    @Value("${app.auto-generate-goals-enabled:false}")
+    private boolean autoGenerateGoalsEnabled;
+
+    @Scheduled(cron = "0 0 0 1 * *")
+    public void runMonthlyGoalGeneration() {
+        if (!autoGenerateGoalsEnabled) {
+            System.out.println("Automatic goal generation is disabled, skipping.");
+            return;
+        }
+        generateDefaultGoalsForAllUsers();
+    }
 
     public GoalResponseDTO createGoal(GoalRequestDTO dto, String userEmail) {
         User user = userRepository.findByEmail(userEmail)
@@ -166,7 +180,7 @@ public class GoalService {
         int month = now.getMonthValue();
         int year = now.getYear();
 
-        String monthName = Month.of(month).getDisplayName(TextStyle.FULL, new Locale("pt", "BR"));
+        String monthName = Month.of(month).getDisplayName(TextStyle.FULL, Locale.of("pt", "BR"));
         String capitalizedMonthName = monthName.substring(0, 1).toUpperCase() + monthName.substring(1);
 
         BigDecimal defaultLimitAmount = new BigDecimal("300.00");
